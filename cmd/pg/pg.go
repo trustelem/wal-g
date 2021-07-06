@@ -26,6 +26,11 @@ var (
 		Short:   WalgShortDescription, // TODO : improve short and long descriptions
 		Version: strings.Join([]string{walgVersion, gitRevision, buildDate, "PostgreSQL"}, "\t"),
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			// these two commands only display documentation, no need to validate RequiredSettings
+			if cmd.Name() == "flags" || cmd.Name() == "help" {
+				return
+			}
+
 			err := internal.AssertRequiredSettingsSet()
 			tracelog.ErrorLogger.FatalOnError(err)
 			if viper.IsSet(internal.PgWalSize) {
