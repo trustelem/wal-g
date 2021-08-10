@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/user"
@@ -420,12 +421,25 @@ func Configure() {
 		tracelog.ErrorLogger.FatalError(err)
 	}
 
-	// Show all ENV vars in DEVEL Logging Mode
-	tracelog.DebugLogger.Println("--- COMPILED ENVIRONMENT VARS ---")
-	environment := os.Environ()
-	sort.Strings(environment)
-	for _, pair := range environment {
-		tracelog.DebugLogger.Println(pair)
+	// Show all relevant ENV vars in DEVEL Logging Mode
+	{
+		var buff bytes.Buffer
+		buff.WriteString("--- COMPILED ENVIRONMENT VARS ---\n")
+
+		var keys []string
+		for k := range viper.AllSettings() {
+			keys = append(keys, strings.ToUpper(k))
+		}
+		sort.Strings(keys)
+
+		for _, k := range keys {
+			val, ok := os.LookupEnv(k)
+			if ok {
+				fmt.Fprintf(&buff, "\t%s=%s\n", k, val)
+			}
+		}
+
+		tracelog.DebugLogger.Print(buff.String())
 	}
 
 	configureLimiters()
