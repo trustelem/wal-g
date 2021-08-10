@@ -197,7 +197,7 @@ var (
 	}
 
 	PGDefaultSettings = map[string]string{
-		PgWalSize:        "16",
+		PgWalSize: "16",
 		PgBackRestStanza: "main",
 	}
 
@@ -302,13 +302,13 @@ var (
 		"S3_MAX_RETRIES":              true,
 
 		// Azure
-		"WALG_AZ_PREFIX":           true,
-		"AZURE_STORAGE_ACCOUNT":    true,
+		"WALG_AZ_PREFIX":          true,
+		"AZURE_STORAGE_ACCOUNT":   true,
 		"AZURE_STORAGE_ACCESS_KEY": true,
-		"AZURE_STORAGE_SAS_TOKEN":  true,
-		"AZURE_ENVIRONMENT_NAME":   true,
-		"WALG_AZURE_BUFFER_SIZE":   true,
-		"WALG_AZURE_MAX_BUFFERS":   true,
+		"AZURE_STORAGE_SAS_TOKEN": true,
+		"AZURE_ENVIRONMENT_NAME":  true,
+		"WALG_AZURE_BUFFER_SIZE":  true,
+		"WALG_AZURE_MAX_BUFFERS":  true,
 
 		// GS
 		"WALG_GS_PREFIX":                 true,
@@ -339,18 +339,18 @@ var (
 
 	PGAllowedSettings = map[string]bool{
 		// Postgres
-		PgPortSetting:        true,
-		PgUserSetting:        true,
-		PgHostSetting:        true,
-		PgDataSetting:        true,
-		PgPasswordSetting:    true,
-		PgDatabaseSetting:    true,
-		PgSslModeSetting:     true,
-		PgSlotName:           true,
-		PgWalSize:            true,
-		"PGPASSFILE":         true,
-		PrefetchDir:          true,
-		PgReadyRename:        true,
+		PgPortSetting:     true,
+		PgUserSetting:     true,
+		PgHostSetting:     true,
+		PgDataSetting:     true,
+		PgPasswordSetting: true,
+		PgDatabaseSetting: true,
+		PgSslModeSetting:  true,
+		PgSlotName:        true,
+		PgWalSize:         true,
+		"PGPASSFILE":      true,
+		PrefetchDir:       true,
+		PgReadyRename:     true,
 		PgBackRestStanza:     true,
 		PgAliveCheckInterval: true,
 		PgStopBackupTimeout:  true,
@@ -718,10 +718,12 @@ func FolderFromConfig(configFile string) (storage.Folder, error) {
 // Applicable for Swift/Postgres/etc libs that waiting config paramenters only from ENV.
 func bindConfigToEnv(globalViper *viper.Viper) {
 	for k, v := range globalViper.AllSettings() {
-		val, ok := v.(string)
-		if ok {
-			err := bindToEnv(k, val)
-			tracelog.ErrorLogger.FatalOnError(err)
+		val, _ := v.(string)
+		if val == "" {
+			continue
 		}
+
+		err := bindToEnv(k, val)
+		tracelog.ErrorLogger.FatalOnError(err)
 	}
 }
