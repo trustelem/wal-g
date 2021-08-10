@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/user"
 	"runtime"
+	"sort"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -421,7 +422,9 @@ func Configure() {
 
 	// Show all ENV vars in DEVEL Logging Mode
 	tracelog.DebugLogger.Println("--- COMPILED ENVIRONMENT VARS ---")
-	for _, pair := range os.Environ() {
+	environment := os.Environ()
+	sort.Strings(environment)
+	for _, pair := range environment {
 		tracelog.DebugLogger.Println(pair)
 	}
 
@@ -489,11 +492,13 @@ func InitConfig() {
 	// Set compiled config to ENV.
 	// Applicable for Swift/Postgres/etc libs that waiting config paramenters only from ENV.
 	for k, v := range viper.AllSettings() {
-		val, ok := v.(string)
-		if ok {
-			err := bindToEnv(k, val)
-			tracelog.ErrorLogger.FatalOnError(err)
+		val, _ := v.(string)
+		if val == "" {
+			continue
 		}
+
+		err := bindToEnv(k, val)
+		tracelog.ErrorLogger.FatalOnError(err)
 	}
 }
 
