@@ -76,8 +76,7 @@ func (tarInterpreter *FileTarInterpreter) unwrapRegularFileOld(fileReader io.Rea
 		return errors.Wrap(err, "Interpret: chmod failed")
 	}
 
-	err = file.Sync()
-	return errors.Wrap(err, "Interpret: fsync failed")
+	return nil
 }
 
 // Interpret extracts a tar file to disk and creates needed directories.
