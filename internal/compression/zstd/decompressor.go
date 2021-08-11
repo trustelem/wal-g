@@ -3,14 +3,15 @@ package zstd
 import (
 	"io"
 
-	"github.com/DataDog/zstd"
+	"github.com/klauspost/compress/zstd"
 	"github.com/wal-g/wal-g/internal/compression/computils"
 )
 
 type Decompressor struct{}
 
 func (decompressor Decompressor) Decompress(src io.Reader) (io.ReadCloser, error) {
-	return zstd.NewReader(computils.NewUntilEOFReader(src)), nil
+	zstdReader, err := zstd.NewReader(computils.NewUntilEOFReader(src))
+	return zstdReader.IOReadCloser(), err
 }
 
 func (decompressor Decompressor) FileExtension() string {
