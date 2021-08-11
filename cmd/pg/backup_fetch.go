@@ -2,6 +2,7 @@ package pg
 
 import (
 	"fmt"
+	"syscall"
 
 	"github.com/wal-g/wal-g/internal/databases/postgres"
 
@@ -53,6 +54,8 @@ var backupFetchCmd = &cobra.Command{
 		}
 
 		internal.HandleBackupFetch(folder, targetBackupSelector, pgFetcher)
+
+		syscall.Sync()
 	},
 }
 
