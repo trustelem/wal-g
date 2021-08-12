@@ -134,6 +134,15 @@ func ResolveSymlink(path string) string {
 	return resolve
 }
 
+func AbsResolveSymlink(path string) string {
+	abs, err := filepath.Abs(path)
+	if err != nil {
+		abs = path
+	}
+
+	return ResolveSymlink(abs)
+}
+
 func GetFileExtension(filePath string) string {
 	ext := path.Ext(filePath)
 	if ext != "" {

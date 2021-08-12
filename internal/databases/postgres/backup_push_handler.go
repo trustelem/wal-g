@@ -311,9 +311,13 @@ func (bh *BackupHandler) HandleBackupPush() {
 		return
 	}
 
-	if utility.ResolveSymlink(bh.arguments.pgDataDirectory) != bh.pgInfo.pgDataDirectory {
-		tracelog.ErrorLogger.Panicf("Data directory read from Postgres (%s) is different then as parsed (%s).",
-			bh.arguments.pgDataDirectory, bh.pgInfo.pgDataDirectory)
+	{
+		fromArg := utility.AbsResolveSymlink(bh.arguments.pgDataDirectory)
+		fromInfo := utility.AbsResolveSymlink(bh.pgInfo.pgDataDirectory)
+		if fromArg != fromInfo {
+			tracelog.ErrorLogger.Panicf("Data directory read from Postgres (%s) is different then as parsed (%s).",
+				bh.arguments.pgDataDirectory, bh.pgInfo.pgDataDirectory)
+		}
 	}
 	bh.checkPgVersionAndPgControl()
 
@@ -379,10 +383,14 @@ func NewBackupHandler(arguments BackupArguments) (bh *BackupHandler, err error) 
 		return bh, err
 	}
 
-	if arguments.pgDataDirectory != "" && arguments.pgDataDirectory != pgInfo.pgDataDirectory {
-		warning := fmt.Sprintf("Data directory for postgres '%s' is not equal to backup-push argument '%s'",
-			arguments.pgDataDirectory, pgInfo.pgDataDirectory)
-		tracelog.WarningLogger.Println(warning)
+	if arguments.pgDataDirectory != "" {
+		fromArg := utility.AbsResolveSymlink(arguments.pgDataDirectory)
+		fromInfo := utility.AbsResolveSymlink(pgInfo.pgDataDirectory)
+		if fromArg != fromInfo {
+			warning := fmt.Sprintf("Data directory for postgres '%s' is not equal to backup-push argument '%s'",
+				arguments.pgDataDirectory, pgInfo.pgDataDirectory)
+			tracelog.WarningLogger.Println(warning)
+		}
 	}
 
 	bh = &BackupHandler{
