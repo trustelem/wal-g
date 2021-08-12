@@ -102,6 +102,5 @@ func (u *BackupFileUnwrapper) writeLocalFile(fileReader io.Reader, header *tar.H
 		return errors.Wrap(err, "Interpret: chmod failed")
 	}
 
-	err = localFile.Sync()
-	return errors.Wrap(err, "Interpret: fsync failed")
+	return nil
 }

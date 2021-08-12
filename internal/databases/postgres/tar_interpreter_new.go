@@ -27,7 +27,7 @@ func (tarInterpreter *FileTarInterpreter) unwrapRegularFileNew(fileReader io.Rea
 		return err
 	}
 	defer utility.LoggedClose(localFile, "")
-	defer utility.LoggedSync(localFile, "")
+
 	var unwrapResult *FileUnwrapResult
 	var unwrapError error
 	if isNewFile {

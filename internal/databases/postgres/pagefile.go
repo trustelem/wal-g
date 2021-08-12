@@ -207,7 +207,6 @@ func ApplyFileIncrement(fileName string, increment io.Reader, createNewIncrement
 		return errors.Wrap(err, "can't open file to increment")
 	}
 	defer utility.LoggedClose(file, "")
-	defer utility.LoggedSync(file, "")
 
 	err = file.Truncate(int64(fileSize))
 	if err != nil {
