@@ -74,15 +74,15 @@ type CurBackupInfo struct {
 
 // PrevBackupInfo holds all information that is harvest during the backup process
 type PrevBackupInfo struct {
-	name             string
-	sentinelDto      BackupSentinelDto
+	name        string
+	sentinelDto BackupSentinelDto
 	filesMetadataDto FilesMetadataDto
 }
 
 // BackupWorkers holds the external objects that the handler uses to get the backup data / write the backup data
 type BackupWorkers struct {
-	uploader    *WalUploader
-	bundle      *Bundle
+	uploader *WalUploader
+	bundle   *Bundle
 	queryRunner *PgQueryRunner
 }
 
@@ -320,9 +320,13 @@ func (bh *BackupHandler) HandleBackupPush() {
 		return
 	}
 
-	if utility.ResolveSymlink(bh.arguments.pgDataDirectory) != bh.pgInfo.pgDataDirectory {
-		tracelog.ErrorLogger.Panicf("Data directory read from Postgres (%s) is different than as parsed (%s).",
-			bh.arguments.pgDataDirectory, bh.pgInfo.pgDataDirectory)
+	{
+		fromArg := utility.AbsResolveSymlink(bh.arguments.pgDataDirectory)
+		fromInfo := utility.AbsResolveSymlink(bh.pgInfo.pgDataDirectory)
+		if fromArg != fromInfo {
+			tracelog.ErrorLogger.Panicf("Data directory read from Postgres (%s) is not the same as parsed (%s).",
+				bh.arguments.pgDataDirectory, bh.pgInfo.pgDataDirectory)
+		}
 	}
 	bh.checkPgVersionAndPgControl()
 
@@ -400,10 +404,14 @@ func NewBackupHandler(arguments BackupArguments) (bh *BackupHandler, err error) 
 		return bh, err
 	}
 
-	if arguments.pgDataDirectory != "" && arguments.pgDataDirectory != pgInfo.pgDataDirectory {
+	if arguments.pgDataDirectory != "" {
+		fromArg := utility.AbsResolveSymlink(arguments.pgDataDirectory)
+		fromInfo := utility.AbsResolveSymlink(pgInfo.pgDataDirectory)
+		if fromArg != fromInfo {
 		warning := fmt.Sprintf("Data directory for postgres '%s' is not equal to backup-push argument '%s'",
 			arguments.pgDataDirectory, pgInfo.pgDataDirectory)
 		tracelog.WarningLogger.Println(warning)
+		}
 	}
 
 	bh = &BackupHandler{
