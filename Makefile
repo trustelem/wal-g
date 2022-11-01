@@ -19,7 +19,8 @@ GOLANGCI_LINT_VERSION ?= "v1.37.0"
 REDIS_VERSION ?= "5.0.8"
 TOOLS_MOD_DIR := ./internal/tools
 
-BUILD_TAGS:=brotli
+#BUILD_TAGS:=brotli
+BUILD_TAGS:=
 
 ifdef USE_LIBSODIUM
 	BUILD_TAGS:=$(BUILD_TAGS) libsodium
